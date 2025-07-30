@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--ADDING BUTTON IN POS-->
+<templates id="template" xml:space="preserve">
+    <t t-name="nhcl_pos_sale.CustomSearch">
+       <div  class="d-flex  shadow-sm bg-view justify-content-end">
+            <Input tModel="[pos, 'searchProductByCode']"
+                    class="'p-2'"
+                    isSmall="ui.isSmall"
+                    placeholder="'Search Products ..' "
+                    icon="{type: 'fa', value: 'fa-search'}"
+                    t-on-keydown="handleKeyDown"
+
+                    />
+
+
+            </div>
+    </t>
+</templates>

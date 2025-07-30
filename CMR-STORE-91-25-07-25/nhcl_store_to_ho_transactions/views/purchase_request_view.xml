@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.request.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-success" role="alert" invisible="nhcl_replication_status == False">
+                    <field name="warning_message" style="white-space: pre-wrap;"/>
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="nhcl_replication_status == True">
+                    <field name="warning_message" style="white-space: pre-wrap;"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='nhcl_po_type']" position="after">
+                <field name="nhcl_replication_status" readonly="1"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_rfq_send']" position="after">
+                <button name="send_purchase_request_to_ho"
+                        string="Sync to HO" class="oe_highlight" type="object"
+                        invisible="nhcl_replication_status == True"
+                /><button name="update_purchase_request_to_ho"
+                        string="Update to HO" class="oe_highlight" type="object"
+
+                />
+                <button name="cancel_purchase_request_to_ho"
+                        string="Cancel to HO" class="oe_highlight" type="object" invisible="state != 'cancel'"/>
+            </xpath>
+            <xpath expr="//header/button[@id='draft_confirm']" position="replace">
+                    <button name="button_confirm" type="object" invisible="1" string="Confirm Order" context="{'validate_analytic': True}" class="oe_highlight" id="bid_confirm" data-hotkey="q"/>
+            </xpath>
+            <xpath expr="//header/field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='taxes_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tax_totals']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
