@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="owl.OwlPosDashboard" owl="1">
+         <section class="section invoice_type">
+           <style>
+           body {
+              background-color: #ffffff !important;
+           }
+            .month-select-container {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background-color: #f9fafb;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                max-width: fit-content;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+            .sub-parent {
+                font-size: 16px;
+                font-weight: 600;
+                margin-top: 5px;
+                margin-left: 10px;
+            }
+
+            .month-label {
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .month-dropdown {
+                padding: 8px 12px;
+                font-size: 14px;
+                color: #1f2937;
+                background-color: #ffffff;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                width: 160px;
+                outline: none;
+                transition: border 0.2s ease;
+            }
+
+            .month-dropdown:focus {
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+            }
+            .kanban-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .kanban-card {
+                background: #fff;
+                border: 1px solid #ccc;
+                padding: 12px;
+                border-radius: 8px;
+                width: 250px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+           .kanban-card:hover {
+                background-color: #f0f0f0;
+            }
+
+           .styled-table {
+            border-collapse: separate;
+            border-spacing: 5px;
+            margin: 10px;
+            width: fit-content;
+            }
+            .styled-table tr {
+                height: 195px;
+            }
+            .sidebar-title {
+              font-weight: bold;
+              margin-top: 1rem;
+              padding: 5px 5px 5px 15px ;
+              color: #444;
+            }
+            .sidebar-item {
+              padding: 8px 12px 0 35px; //top-right-bottom-left
+              font-size:14px;
+              color: black;
+              cursor: pointer;
+            }
+            .sidebar-item:hover {
+             background-color: #F5F5F5;
+            }
+            .sidebar-item.active {
+              background-color: #f2f7fc;
+              color: #2b6340;
+            }
+           .styled-table td {
+           padding: 7;
+           text-align: center;
+           color: #333;
+           width: 250px;
+           border-radius: 0.5px;
+           }
+           .info-title {
+            color: #888888;
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align:center;
+            font-weight: 600;
+           }
+           .info-number {
+           font-weight:600;
+           font-size: 36px;
+           text-align:center;
+           padding-top: 25px;
+           }
+            .master-tab{
+            background-color: #f2f2f2;
+            }
+            .master-title {
+            color: #888888;
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align:center;
+            font-weight: 600;
+            }
+           .buttons{
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+           }
+
+            .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #444;
+            margin: 8px;
+            letter-spacing: 0.8px;
+            }
+            .button-group {
+              display: flex;
+              gap: 16px; /* spacing between buttons */
+              justify-content: left;
+              flex-wrap: wrap;
+              margin: 20px 0;
+            }
+               .month-label{
+                font-weight:bold;
+               padding:0 0 0 15px;
+               }
+            .sidebar {
+            background-color: #ffff; /* Odoo light background */
+            border-right: 1px solid #e0e0e0;
+            width: 240px;
+            height: 80vh;
+            overflow-y: auto;
+            }
+            .clickable-div {
+            cursor: pointer; /* Makes the cursor appear clickable */
+            }
+           .filter-row {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                padding: 10px;
+                flex-wrap: wrap; /* Allows wrapping on smaller screens */
+            }
+
+            .filter-row label {
+               display: flex;
+                font-weight: 600;
+                margin-right: 5px;
+                font-family: Arial, sans-serif;
+            }
+
+            .filter-dropdown {
+                padding: 5px 10px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                font-size: 14px;
+                width: 160px;
+            }
+           .record-count {
+                margin-left: auto;
+               margin-right:100px;
+                margin-top: 10px;
+                font-size: 14px;
+                color: #333;
+            }
+       </style>
+             <div class="title"><span>Promotions Dashboard </span></div>
+             <div class="row">
+                <div class="border m-0 p-0 bg-white"/>
+                 <div class="col-lg-3 sidebar" style="background-color: #fff; padding: 1rem;">
+                     <div class="bulk-sidebar">
+                         <t t-set="lastParent" t-value="''"/>
+                         <t t-foreach="menuItems" t-as="item" t-key="item.id">
+                             <t t-if="item.parent !== lastParent">
+                             <div class="sidebar-title">
+                                <t t-esc="item.parent"/>
+                             </div>
+                                 <t t-set="lastParent" t-value="item.parent"/>
+                             </t>
+                             <div class="sidebar-item sub-parent "
+                                  t-att-class="state.selected === item.id ? 'active' : ''"
+                                  t-on-click="() => selectMenu(item.id)">
+                                <t t-esc="item.label"/>
+                             </div>
+                         </t>
+                     </div>
+                </div>
+                 <div class="col" style="padding: 1rem; bg-white">
+                    <div class="filter-row ">
+                         <div class="filter-group">
+                            <select class="o_input d-flex flex-wrap gap-1 o_multi_record_selector"
+                                    >
+                                <t t-foreach="state.selectedPromo" t-as="t" t-key="t.id">
+                                    <option t-att-value="t.id" t-att-selected="state.selectedPromo === t.id">
+                                        <t t-esc="t.name" />
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select class="o_input d-flex flex-wrap gap-1 o_multi_record_selector"
+                                    >
+                                <t t-foreach="state.selectedCategories" t-as="t" t-key="t.id">
+                                    <option t-att-value="t.id" t-att-selected="state.categoryList === t.id">
+                                        <t t-esc="t.name" />
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+<!-- the filter for the select date -->
+                        <div class="filter-group">
+<!--                            <label>Select Time Period:</label>-->
+                            <select class="o_input d-flex flex-wrap" t-model="state.period">
+                                <option value="0">Select Period</option>
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                                <option value="180">Last 180 Days</option>
+                                <option value="365">Last 365 Days</option>
+                                <option value="1068">Last 3 Years</option>
+                            </select>
+                        </div>
+                        <!--      the count filter-->
+                        <div class="record-count">
+                            Total Categories: <t t-esc="state.recordCount" />
+                        </div>
+
+                    </div>
+                    <br/>
+                     <t t-if="state.selected === 1">
+                        <div>
+                            <table style="border-collapse: separate; border-spacing: 0 10px; text-align: center;" >
+                                <thead style="font-weight:bold;">
+                                    <tr>
+                                        <th class="text-center" style="width: 20%" scope="col">Category Name</th>
+                                        <th class="text-center" style="width: 13%" scope="col">Active Promotions</th>
+                                        <th class="text-center" style="width: 13%" scope="col">No Of Quantity</th>
+                                        <th class="text-center" style="width: 13%" scope="col">Sold Quantity</th>
+                                        <th class="text-center" style="width: 13%" scope="col">Available</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="state.categorySummary" t-as="cat" t-key="cat.category">
+                                        <tr>
+                                            <td>
+                                               <span><t t-esc="cat.category"/></span>
+                                            </td>
+                                            <td>
+                                               <span><t t-esc="cat.promotion_count"/></span>
+                                            </td>
+                                            <td>
+                                               <span><t t-esc="cat.total_serials"/></span>
+                                            </td>
+                                            <td>
+                                               <span><t t-esc="cat.sold_serials"/></span>
+                                            </td>
+                                            <td>
+                                               <span><t t-esc="cat.available_serials"/></span>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </div>
+             </div>
+         </section>
+    </t>
+</templates>
