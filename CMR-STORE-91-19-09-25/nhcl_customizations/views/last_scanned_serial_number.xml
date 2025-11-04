@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="last_scanned_serial_number_view_tree" model="ir.ui.view">
+        <field name="name">last.scanned.serial.number.view.tree</field>
+        <field name="model">last.scanned.serial.number</field>
+        <field name="arch" type="xml">
+            <tree create="0" editable="bottom" string="Last_scanned_serial_number">
+                <field name="Receipt_number"/>
+                <field name="document_number" optional="hide"/>
+                <field name="stock_product_id"/>
+                <field name="stock_serial"/>
+                <field name="stock_product_barcode"/>
+                <field name="stock_qty"/>
+                <field name="store_name"/>
+                <field name="date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+
+
+    <!-- Actions -->
+    <record id="last_scanned_serial_number_action" model="ir.actions.act_window">
+        <field name="name">Last scanned serial number</field>
+        <field name="res_model">last.scanned.serial.number</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first last scanned serial number!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="last_scanned_serial_number_menu"
+              name="Last scanned serial number"
+              action="last_scanned_serial_number_action"
+              parent="stock.menu_warehouse_report"
+              sequence="10"/>
+</odoo>

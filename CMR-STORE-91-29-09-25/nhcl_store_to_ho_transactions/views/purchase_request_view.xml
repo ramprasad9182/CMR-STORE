@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.request.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+<!--            <xpath expr="//field[@name='order_line']" position="attributes">-->
+<!--                <attribute name="readonly">nhcl_update_status == True</attribute>-->
+<!--            </xpath>-->
+
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="readonly">(upload_type == 'pt_upload' and nhcl_replication_status) or (upload_type !=
+                    'pt_upload' and nhcl_update_status)
+                </attribute>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-success" role="alert" invisible="nhcl_replication_status == False">
+                    <field name="warning_message" style="white-space: pre-wrap;"/>
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="nhcl_replication_status == True">
+                    <field name="warning_message" style="white-space: pre-wrap;"/>
+                </div>
+                 <div class="alert alert-success" role="alert" invisible="nhcl_update_status == False or upload_type == 'pt_upload'">
+                    <field name="update_warning_message" style="white-space: pre-wrap;"/>
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="nhcl_update_status == True or upload_type == 'pt_upload'">
+                    <field name="update_warning_message" style="white-space: pre-wrap;"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='nhcl_po_type']" position="after">
+                <field name="nhcl_replication_status" readonly="1"/>
+                <field name="nhcl_update_status" readonly="1"/>
+
+            </xpath>
+            <xpath expr="//field[@name='picking_type_id']" position="after">
+                <field name="invoice_number" string="Invoice Number"
+                       readonly="nhcl_replication_status"
+                       required="upload_type == 'pt_upload'"
+                       invisible="upload_type != 'pt_upload'"/>
+                <field name="upload_type" readonly="nhcl_replication_status == True"/>
+                <button name="action_open_upload_wizard" type="object" string="Upload PT" class="btn-primary"
+                        invisible="upload_type != 'pt_upload'"/>
+            </xpath>
+              <xpath expr="//field[@name='product_template_id']" position="after">
+                <field name="icode_barcode" column_invisible="parent.upload_type != 'pt_upload'"/>
+<!--                 <field name="article_name"/>-->
+                <field name="brand" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="size" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="design" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="fit" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="colour" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="product_excel" column_invisible="parent.upload_type != 'pt_upload'"/>
+<!--                <field name="standard_rate" column_invisible="parent.upload_type != 'pt_upload'"/>-->
+                <field name="mrp" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="rsp" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="item_vendor_id" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="hsn_sac_code" column_invisible="parent.upload_type != 'pt_upload'"/>
+                <field name="des5" column_invisible="parent.upload_type != 'pt_upload'"/>
+<!--                <field name="des6" column_invisible="parent.upload_type != 'pt_upload'"/>-->
+
+            </xpath>
+            <xpath expr="//header/button[@name='action_rfq_send']" position="after">
+                <button name="send_purchase_request_to_ho"
+                        string="Sync to HO" class="oe_highlight" type="object"
+                        invisible="nhcl_replication_status == True"
+                />
+                <button name="update_purchase_request_to_ho"  invisible="nhcl_update_status == True or nhcl_replication_status == False or  upload_type in ['pt_upload']"
+                        string="Update to HO" class="oe_highlight" type="object"
+
+                />
+                <button name="cancel_purchase_request_to_ho"
+                        string="Cancel to HO" class="oe_highlight" type="object" invisible="state != 'cancel'"/>
+            </xpath>
+            <xpath expr="//header/button[@id='draft_confirm']" position="replace">
+                <button name="button_confirm" type="object" invisible="1" string="Confirm Order"
+                        context="{'validate_analytic': True}" class="oe_highlight" id="bid_confirm" data-hotkey="q"/>
+            </xpath>
+            <xpath expr="//header/field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='taxes_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tax_totals']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
