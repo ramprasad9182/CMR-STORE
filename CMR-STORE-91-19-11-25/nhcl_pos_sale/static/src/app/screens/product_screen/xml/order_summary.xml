@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates id="template" xml:space="preserve">
+    <t t-name="nhcl_pos_sale.OrderSummaryPopup" owl="1">
+        <div class="order-summary-button">
+            <button t-on-click="toggleSummary" class="btn btn-primary">
+                Order Summary
+            </button>
+        </div>
+
+        <div t-if="state.showSummary" class="order-summary-popup">
+            <div class="popup-content" style="background-color: white; padding: 20px; border-radius: 8px;">
+                <ul>
+                    <li>Gross: <t t-esc="summary.gross"/></li>
+                    <li>Bill Promotion: <t t-esc="summary.discount"/></li>
+                    <li>Bill Discount: <t t-esc="summary.global_discount"/></li>
+                    <li>Coupon Discount: <t t-esc="summary.coupon_discount"/></li>
+                    <li>Loyalty Discount: 0.0</li>
+                    <li>Extra Charges: 0.0</li>
+                    <li>Net Sale: <t t-esc="summary.netSale"/></li>
+                    <li>Round Off: 0.0</li>
+                    <li>Net Payable: <t t-esc="summary.netSale"/></li>
+                    <li>Total: <t t-esc="summary.netSale"/></li>
+                </ul>
+                <button t-on-click="toggleSummary" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>

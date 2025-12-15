@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+<!--    <t t-name="nhcl_pos_custom_tax.Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension">-->
+<!--        <xpath expr="//li[hasclass('price-per-unit')]" position="after">-->
+<!--            <li class="nf_tax_details" >-->
+<!--                <t t-log="line.tax_details" ></t>-->
+<!--                <t t-out="line.tax_details.name" /> : <t t-out="line.tax_details.amount" />-->
+<!--            </li>-->
+<!--        </xpath>-->
+<!--    </t>-->
+    <t t-name="nhcl_pos_custom_tax.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+         <xpath expr="//ReceiptHeader" position="after">
+                     <t t-if="props.data.amount_total &lt; 0">
+                <div  style="font-weight: bold; color: red;text-align:center;font-size:30px;">
+                    Credit Note
+                </div>
+            </t>
+
+<!--            <div t-if="props.data.company.cl_vat" class="chili-ticket-info fw-bolder border border-dark d-flex flex-column align-items-center ">-->
+<!--                <span>RUT: <t t-out="props.data.company.cl_vat"/>-->
+<!--                </span>-->
+<!--                <t t-out="props.data.l10n_latam_document_type"/>-->
+<!--                <span>Nº: <t t-out="props.data.l10n_latam_document_number"/>-->
+<!--                </span>-->
+<!--            <//div>-->
+<!--            <div t-if="props.data.company.cl_vat" class="chili-regional-office text-center fw-bolder" t-out="props.data.l10n_cl_sii_regional_office"/>-->
+<!--            <div t-if="props.data.company.cl_vat" class="text-center fw-bolder pb-2" t-esc="props.data.date" />-->
+<!--            <br/>-->
+        </xpath>
+
+        <xpath expr="//div[@class='pos-receipt-amount'][contains(., 'TOTAL')]" position="replace">
+            <div class="pos-receipt-amount">
+                <strong>TOTAL</strong>
+                <strong><span t-esc="props.formatCurrency(props.data.amount_total)" class="pos-receipt-right-align"/></strong>
+            </div>
+        </xpath>
+
+<!--        <t t-if="props.data.amount_total &lt; 0">-->
+<!--                <div  style="font-weight: bold; color: red;text-align:center;">-->
+<!--                    Credit Note-->
+<!--                </div>-->
+<!--            </t>-->
+<!--        <xpath expr="//span[@t-if=&quot;tax.tax.amount_type != &apos;fixed&apos;&quot;]" position="replace">-->
+<!--            <span t-if="tax.tax.amount_type != 'fixed'"> </span>-->
+<!--        </xpath>-->
+    </t>
+</templates>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Add salesperson in orderline-->
+<templates id="template" xml:space="preserve">
+    <t t-name="Orderline" t-inherit="point_of_sale.Orderline"
+          t-inherit-mode="extension" owl="1">
+
+        <xpath expr="//ul[hasclass('info-list')]/li[2]" position="replace">
+       <b>
+            <li t-if="line.price !== 0 and line.discount and line.discount !== '0'">
+                    <t t-esc="line.price_without_discount"/> With a <em><t t-esc="line.discount" />% </em> discount
+                </li>
+       </b>
+
+        </xpath>
+
+
+           <xpath expr="//ul[hasclass('info-list')]" position="inside">
+               <b>
+                <t t-if="line.product_mrp">
+                RS Price:
+
+            <span id="variant_values" t-esc="line.product_mrp"/>
+            </t>
+               </b>
+
+                 <b>
+                <t t-if="line.gdiscount">
+                ,Global Disc:
+            <span id="variant_values" t-esc="line.gdiscount"/>%.
+            </t>
+                 </b>
+
+               <br/>
+
+               <t t-if="line.barcode">
+                barcode:
+            <span id="variant_values" t-esc="line.barcode"/>
+            </t>
+                <t t-if="line.product_tax">
+                Tax:
+            <span id="variant_values" t-esc="line.product_tax"/>
+            </t>
+               <t t-if="line.empNo">
+                Sales Man:
+            <span id="variant_values" t-esc="line.empNo"/>
+            </t>
+
+        </xpath>
+    </t>
+</templates>
