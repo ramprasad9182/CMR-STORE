@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="allow_slip_note_pos">
+        <main>
+            <t t-call="web.html_container">
+
+                <t t-foreach="docs" t-as="o">
+
+                    <div style="
+                    width:72mm;
+                    margin:0 auto;
+                    font-family:'Courier New', monospace;
+                    font-size:12px;
+                    color:#000;
+                ">
+
+                        <!-- HEADER -->
+                        <div style="text-align:center;">
+                            <div style="font-weight:bold;font-size:16px;">
+                                <t t-esc="o.company_id.name"/>
+                            </div>
+
+                            <div style="font-size:11px;">
+                                <t t-esc="o.company_id.partner_id.contact_address"/>
+                            </div>
+                        </div>
+
+                        <div style="border-top:1px dashed black;margin:6px 0;"></div>
+
+                        <!-- TITLE -->
+                        <div style="text-align:center;font-size:18px;font-weight:bold;">
+                            ALLOW SLIP
+                        </div>
+
+                        <div style="border-top:1px dashed black;margin:6px 0;"></div>
+
+                        <!-- INFO -->
+                        <div>
+                            Slip No :
+                            <span t-field="o.name"/>
+                        </div>
+
+
+                        <div>
+                            Date :
+                            <span t-field="o.date_time_nh"/>
+                        </div>
+
+                        <div style="border-top:1px dashed black;margin:6px 0;"></div>
+
+                        <!-- ITEMS -->
+                        <!-- ITEMS -->
+                        <table style="width:100%; border-collapse:collapse;">
+
+                            <!-- HEADER ROW -->
+                            <tr style="border-bottom:1px solid black; font-weight:bold;">
+
+                                <td style="width:40%;">Item</td>
+
+                                <td style="
+            width:25%;
+            text-align:center;
+            padding-left:6px;
+            padding-right:6px;
+        ">
+                                    SN
+                                </td>
+
+                                <td style="
+            width:15%;
+            text-align:center;
+            padding-left:10px;
+            padding-right:10px;
+        ">
+                                    Qty
+                                </td>
+
+<!--                                <td style="-->
+<!--            width:20%;-->
+<!--            text-align:right;-->
+<!--            padding-left:10px;-->
+<!--        ">-->
+<!--                                    Price-->
+<!--                                </td>-->
+
+                            </tr>
+
+                            <!-- PRODUCT LINES -->
+                            <t t-foreach="o.move_ids_without_package.filtered(lambda m: m.nhcl_exchange)" t-as="line">
+
+                                <tr style="border-bottom:1px dotted black;">
+
+                                    <!-- ITEM -->
+                                    <td style="width:40%; padding:3px 0;">
+                                        <div>
+                                            <t t-esc="line.product_id.display_name"/>
+                                        </div>
+
+                                        <div t-if="line.product_id.barcode" style="font-size:11px;">
+                                            <t t-esc="line.product_id.barcode"/>
+                                        </div>
+                                    </td>
+
+                                    <!-- SERIAL NUMBER -->
+                                    <td style="
+                width:25%;
+                text-align:center;
+                padding-left:6px;
+                padding-right:6px;
+                white-space:nowrap;
+            ">
+                                        <t t-if="line.serial_no">
+                                            <t t-esc="line.serial_no"/>
+                                        </t>
+                                    </td>
+
+                                    <!-- QUANTITY -->
+                                    <td style="
+                width:15%;
+                text-align:center;
+                padding-left:10px;
+                padding-right:10px;
+                white-space:nowrap;
+            ">
+                                        <t t-esc="'%.2f' % line.quantity"/>
+                                    </td>
+
+<!--                                    &lt;!&ndash; PRICE &ndash;&gt;-->
+<!--                                    <td style="-->
+<!--                                            width:20%;-->
+<!--                                            text-align:right;-->
+<!--                                            padding-left:10px;-->
+<!--                                            white-space:nowrap;-->
+<!--                                        ">-->
+<!--                                        <t t-esc="'%.2f' % line.nhcl_price_total"/>-->
+<!--                                    </td>-->
+
+                                </tr>
+
+                            </t>
+
+<!--                            &lt;!&ndash; TOTALS &ndash;&gt;-->
+<!--                            <tr style="border-top:1px solid black; font-weight:bold;">-->
+
+<!--                                <td colspan="2" style="padding-top:4px;">Total :</td>-->
+
+<!--                                <td style="text-align:center; padding-left:10px;">-->
+<!--                                    <t t-esc="'%.2f' % sum(o.move_ids_without_package.filtered(lambda m: m.nhcl_exchange).mapped('quantity'))"/>-->
+<!--                                </td>-->
+
+<!--                                <td style="text-align:right; padding-left:10px;">-->
+<!--                                    <t t-esc="'%.2f' % sum(o.move_ids_without_package.filtered(lambda m: m.nhcl_exchange).mapped('nhcl_price_total'))"/>-->
+<!--                                </td>-->
+
+<!--                            </tr>-->
+
+                        </table>
+
+                        <!-- SIGNATURE -->
+                        <div style="margin-top:20px;">
+                            Signature
+                            <div style="border-bottom:1px solid black;width:300px;"></div>
+                        </div>
+
+                        <div style="text-align:center;margin-top:10px;font-size:11px;">
+                            Slip to be returned at allow slip counter
+                        </div>
+
+                    </div>
+
+                </t>
+
+            </t>
+        </main>
+    </template>
+
+    <!-- Thermal Paper Format -->
+    <record id="custom_paper_format" model="report.paperformat">
+        <field name="name">POS Slip Paper</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">80</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="allow_slip_credit_note" model="ir.actions.report">
+    <field name="name">Your Slip</field>
+    <field name="model">stock.picking</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">nhcl_customizations.allow_slip_note_pos</field>
+    <field name="report_file">nhcl_customizations.allow_slip_note_pos</field>
+
+    <!-- THIS LINE REMOVES THE POPUP -->
+<!--    <field name="default_print_option">print</field>-->
+
+    <field name="paperformat_id" ref="nhcl_customizations.custom_paper_format"/>
+</record>
+</odoo>

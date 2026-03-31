@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="advanced_real_time_pos_dashboard.Dashboard">
+    <div class="o_pos_realtime_dashboard">
+            <!-- Header -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1>📊 Real-Time POS Dashboard</h1>
+                <span class="last-update">
+                    <i class="fa fa-clock-o"/> Last updated: <t t-esc="state.lastUpdate"/>
+                </span>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary refresh-btn" t-on-click="refreshData">
+                    <i class="fa fa-refresh"/> Refresh
+                </button>
+            </div>
+        </div>
+
+            <!-- Filter Section -->
+        <div class="filter-section">
+                <!-- Quick Date Filter Buttons -->
+            <div class="date-filter-presets">
+                <label>Quick Date Filter:</label>
+                <div class="preset-buttons">
+                    <button class="btn btn-sm" t-att-class="{'btn-primary': state.dateFilter === 'today', 'btn-outline-primary': state.dateFilter !== 'today'}" 
+                            t-on-click="() => this.setDateFilterPreset('today')">
+                        <i class="fa fa-calendar"/> Today
+                    </button>
+                    <button class="btn btn-sm" t-att-class="{'btn-primary': state.dateFilter === 'week', 'btn-outline-primary': state.dateFilter !== 'week'}" 
+                            t-on-click="() => this.setDateFilterPreset('week')">
+                        <i class="fa fa-calendar"/> This Week
+                    </button>
+                    <button class="btn btn-sm" t-att-class="{'btn-primary': state.dateFilter === 'month', 'btn-outline-primary': state.dateFilter !== 'month'}" 
+                            t-on-click="() => this.setDateFilterPreset('month')">
+                        <i class="fa fa-calendar"/> This Month
+                    </button>
+                    <button class="btn btn-sm" t-att-class="{'btn-primary': state.dateFilter === 'year', 'btn-outline-primary': state.dateFilter !== 'year'}" 
+                            t-on-click="() => this.setDateFilterPreset('year')">
+                        <i class="fa fa-calendar"/> This Year
+                    </button>
+                    <button class="btn btn-sm" t-att-class="{'btn-primary': state.dateFilter === 'all', 'btn-outline-primary': state.dateFilter !== 'all'}" 
+                            t-on-click="() => this.setDateFilterPreset('all')">
+                        <i class="fa fa-calendar"/> All Time
+                    </button>
+                </div>
+            </div>
+
+                <!-- Custom Date Range -->
+            <t t-if="state.dateFilter === 'custom' or (state.startDate or state.endDate)">
+                <div class="custom-date-range">
+                    <label>Custom Date Range:</label>
+                    <div class="date-inputs">
+                        <div class="date-group">
+                            <label for="start-date">From:</label>
+                            <input type="date" id="start-date" class="form-control" 
+                                   t-on-change="onStartDateChange" t-att-value="state.startDate"/>
+                        </div>
+                        <div class="date-group">
+                            <label for="end-date">To:</label>
+                            <input type="date" id="end-date" class="form-control" 
+                                   t-on-change="onEndDateChange" t-att-value="state.endDate"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+            <div class="filter-controls">
+                    <!-- Session Filter -->
+                <div class="filter-group">
+                    <label for="session-filter">Filter by Session:</label>
+                    <select id="session-filter" class="form-control" t-on-change="onSessionChange">
+                        <option value="">All Sessions</option>
+                        <t t-foreach="state.sessions" t-as="session" t-key="session.session_id || session.id">
+                            <option t-att-value="session.session_id || session.id">
+                                <t t-esc="session.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+
+                    <!-- Status Filter -->
+                <div class="filter-group">
+                    <label for="status-filter">Filter by Status:</label>
+                    <select id="status-filter" class="form-control" t-on-change="onFilterTypeChange" t-att-value="state.filterType">
+                        <option value="all">All Orders</option>
+                        <option value="draft">Draft</option>
+                        <option value="paid">Paid</option>
+                        <option value="done">Done</option>
+                        <option value="invoiced">Invoiced</option>
+                        <option value="cancel">Cancel</option>
+                    </select>
+                </div>
+
+                    <!-- Search -->
+                <div class="filter-group">
+                    <label for="search-input">Search:</label>
+                    <input type="text" id="search-input" class="form-control" placeholder="Search by Order Ref, Customer..." 
+                           t-on-input="onSearchChange" t-att-value="state.searchText"/>
+                </div>
+
+                    <!-- Clear Filters Button -->
+                <button class="btn btn-secondary clear-filters-btn" t-on-click="clearFilters">
+                    <i class="fa fa-times"/> Clear Filters
+                </button>
+            </div>
+
+                <!-- Export Section -->
+            <div class="export-controls">
+                <label>Export Data:</label>
+                <button class="btn btn-success export-csv-btn" t-on-click="exportToCSV">
+                    <i class="fa fa-file-csv"/> CSV
+                </button>
+                <button class="btn btn-info export-json-btn" t-on-click="exportToJSON">
+                    <i class="fa fa-file-code"/> JSON
+                </button>
+                <button class="btn btn-warning export-print-btn" t-on-click="printOrders">
+                    <i class="fa fa-print"/> Print
+                </button>
+            </div>
+        </div>
+
+            <!-- Loading State -->
+        <t t-if="state.isLoading">
+            <div class="loading-spinner">
+                <i class="fa fa-spinner fa-spin fa-3x"/>
+                <p>Loading dashboard data...</p>
+            </div>
+        </t>
+
+        <t t-else="">
+                <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card total-sales">
+                    <div class="stat-icon">
+                        <i class="fa fa-money"/>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Today's Sales</h3>
+                        <p class="stat-value"><t t-esc="formatCurrency(state.todaySales, state.currencyId)"/></p>
+                    </div>
+                </div>
+
+                <div class="stat-card total-orders">
+                    <div class="stat-icon">
+                        <i class="fa fa-shopping-cart"/>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total Orders</h3>
+                        <p class="stat-value"><t t-esc="state.totalOrders"/></p>
+                    </div>
+                </div>
+
+                <div class="stat-card average-order">
+                    <div class="stat-icon">
+                        <i class="fa fa-calculator"/>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Average Order</h3>
+                        <p class="stat-value"><t t-esc="formatCurrency(state.averageOrder, state.currencyId)"/></p>
+                    </div>
+                </div>
+
+                <div class="stat-card paid-orders">
+                    <div class="stat-icon">
+                        <i class="fa fa-check-circle"/>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Paid Orders</h3>
+                        <p class="stat-value"><t t-esc="state.paidOrders"/></p>
+                    </div>
+                </div>
+
+                <div class="stat-card pending-orders">
+                    <div class="stat-icon">
+                        <i class="fa fa-clock-o"/>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Pending Orders</h3>
+                        <p class="stat-value"><t t-esc="state.pendingOrders"/></p>
+                    </div>
+                </div>
+
+                <div class="stat-card active-sessions">
+                    <div class="stat-icon">
+                        <i class="fa fa-desktop"/>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Active Sessions</h3>
+                        <p class="stat-value"><t t-esc="state.sessions.length"/></p>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Main Content Grid -->
+            <div class="content-grid">
+                    <!-- Recent Orders Table -->
+                <div class="dashboard-card orders-card">
+                    <div class="card-header">
+                        <h2><i class="fa fa-list-alt"/> Recent Orders</h2>
+                        <span class="badge badge-info">
+                            <t t-if="state.filteredOrders.length > 0">
+                                <t t-esc="state.filteredOrders.length"/> filtered orders
+                            </t>
+                            <t t-else="">
+                                <t t-esc="state.orders.length"/> orders
+                            </t>
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="(state.filteredOrders.length > 0 ? state.filteredOrders : state.orders).length === 0">
+                            <div class="no-data">
+                                <i class="fa fa-inbox fa-3x"/>
+                                <p>No orders found</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order Ref</th>
+                                            <th>Customer</th>
+                                            <th>Session</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="(state.filteredOrders.length > 0 ? state.filteredOrders : state.orders).slice(0, 20)" t-as="order" t-key="order.order_id || order.id">
+                                            <tr class="order-row" t-att-class="{'new-order-highlight': order.isNew}">
+                                                <td class="order-ref">
+                                                    <strong><t t-esc="order.pos_reference || order.name"/></strong>
+                                                </td>
+                                                <td>
+                                                    <i class="fa fa-user-o"/> <t t-esc="order.partner_name"/>
+                                                </td>
+                                                <td>
+                                                    <span class="session-badge">
+                                                        <t t-esc="order.session_name"/>
+                                                    </span>
+                                                </td>
+                                                <td class="order-amount">
+                                                    <t t-esc="formatCurrency(order.amount_total, state.currencyId)"/>
+                                                </td>
+                                                <td>
+                                                    <span t-att-class="'badge ' + getStateClass(order.state)">
+                                                        <t t-esc="getStateLabel(order.state)"/>
+                                                    </span>
+                                                </td>
+                                                <td class="order-time">
+                                                    <t t-esc="formatDateTime(order.date_order)"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                    <!-- Active Sessions -->
+                <div class="dashboard-card sessions-card">
+                    <div class="card-header">
+                        <h2><i class="fa fa-desktop"/> Active Sessions</h2>
+                        <span class="badge badge-success live-indicator">
+                            <i class="fa fa-circle pulse"/> LIVE
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="state.sessions.length === 0">
+                            <div class="no-data">
+                                <i class="fa fa-power-off fa-3x"/>
+                                <p>No active sessions</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="sessions-list">
+                                <t t-foreach="state.sessions" t-as="session" t-key="session.session_id || session.id">
+                                    <div class="session-item">
+                                        <div class="session-icon">
+                                            <i class="fa fa-desktop"/>
+                                        </div>
+                                        <div class="session-info">
+                                            <h4><t t-esc="session.name"/></h4>
+                                            <p>
+                                                <i class="fa fa-user"/> <t t-esc="session.user_name"/>
+                                            </p>
+                                            <p>
+                                                <i class="fa fa-building"/> <t t-esc="session.config_name"/>
+                                            </p>
+                                        </div>
+                                        <div class="session-status">
+                                            <span class="badge badge-success">
+                                                <t t-esc="session.state"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                    <!-- Payment Methods Breakdown -->
+                <div class="dashboard-card payment-methods-card">
+                    <div class="card-header">
+                        <h2><i class="fa fa-credit-card"/> Payment Methods Breakdown</h2>
+                    </div>
+                    <div class="card-body">
+                        <t t-if="state.paymentMethodsData.length === 0">
+                            <div class="no-data">
+                                <i class="fa fa-ban fa-3x"/>
+                                <p>No payment data available</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="payment-methods-container">
+                                <div class="pie-chart-wrapper">
+                                    <svg class="pie-chart" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+                                        <t t-foreach="getPaymentChartSVG()" t-as="slice" t-key="slice.label">
+                                            <path t-att-d="slice.path" t-att-fill="slice.color" class="pie-slice"/>
+                                        </t>
+                                    </svg>
+                                </div>
+                                <div class="payment-legend">
+                                    <t t-foreach="state.paymentMethodsData" t-as="method" t-key="method.label">
+                                        <div class="legend-item">
+                                            <span class="legend-color" t-att-style="`background-color: ${method.color}`"/>
+                                            <div class="legend-info">
+                                                <strong><t t-esc="method.label"/></strong>
+                                                <span class="legend-value">
+                                                    <t t-esc="formatCurrency(method.value, state.currencyId)"/> 
+                                                    <span class="percentage">(<t t-esc="method.percentage"/>%)</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </div>
+</t>
+
+</templates>

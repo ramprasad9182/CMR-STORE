@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_job_initiated_status,nhcl.initiated.status.log,model_nhcl_initiated_status_log,,1,1,1,1
+access_transaction_replication_log,nhcl.transaction.replication.log,model_nhcl_transaction_replication_log,,1,1,1,1
+access_scan_pt_upload_lines_user,access.scan.pt.upload.lines.user,model_scan_pt_upload_lines,,1,1,1,1
+access_audit_replication_log,nhcl.audit.replication.log,model_nhcl_audit_replication_log,,1,1,1,1
