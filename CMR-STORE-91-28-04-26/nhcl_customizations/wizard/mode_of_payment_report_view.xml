@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="pos_mop_wise_report" model="ir.ui.view">
+        <field name="name">MOP By Store Report</field>
+        <field name="model">pos.mop.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="POS mop Summary Report">
+                <h1 style="color:black;font-weight:1000;text-align:center;">POS Mode Of Payment Report
+                </h1>
+                <sheet>
+                    <header>
+                        <button name="get_grouped_payments" class="btn btn-primary" string="View Mop report" type="object"/>
+                        <button name="get_grouped_payments_in_excel" class="btn btn-primary" string="Excel"
+                                type="object"/>
+                        <button special="cancel" string="Cancel"/>
+                    </header>
+                    <group name="pos_mop_report" style="border: 2px solid #990099; padding: 10px;">
+                        <group>
+                            <field name="nhcl_company_id"
+                                   placeholder="Select Company"/>
+
+                        </group>
+                        <group>
+                            <field name="from_date" required="1"/>
+                            <field name="to_date" required="1"/>
+                        </group>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="report_pos_mop_pdfsss" model="ir.actions.report">
+        <field name="name">POS mop Wise Report</field>
+        <field name="model">pos.mop.report.wizard</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">nhcl_customizations.pos_payment_grouped_report</field>
+        <field name="report_file">nhcl_customizations.pos_payment_grouped_report</field>
+        <field name="binding_type">report</field>
+
+    </record>
+
+
+</odoo>

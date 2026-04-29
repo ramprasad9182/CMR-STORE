@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+<!--    <t t-name="nhcl_pos_custom_tax.ReceiptHeader" t-inherit="point_of_sale.ReceiptHeader" t-inherit-mode="extension">-->
+<!--        <xpath expr="." position="replace">-->
+<!--            <div class="pos-receipt-center-align">-->
+<!--                <t t-if="props.data.is_copy">-->
+<!--                    "Duplicate Receipt"-->
+<!--                </t>-->
+<!--                <t t-else="">-->
+<!--                    "Customer Receipt"-->
+<!--                </t>-->
+<!--            </div>-->
+<!--            <img t-attf-src="/web/image?model=res.company&amp;id={{props.data.company.id}}&amp;field=logo" alt="Logo" class="pos-receipt-logo"/>-->
+<!--            <br/>-->
+<!--            <h1 class="tracking-number text-center" style="font-size: 100px" t-if="props.data.trackingNumber and props.data.bigTrackingNumber" t-esc="props.data.trackingNumber" />-->
+<!--            <div class="pos-receipt-contact">-->
+<!--                &lt;!&ndash; contact address &ndash;&gt;-->
+<!--                <div t-if="props.data.company.partner_id?.[1]" t-esc="props.data.company.partner_id[1]" />-->
+<!--                <br/>-->
+<!--                <t t-if="props.data.company.address">-->
+<!--                    <t t-esc="props.data.company.address" />-->
+<!--                    <br/>-->
+<!--                </t>-->
+<!--                <div class="pos-receipt-center-align">-->
+<!--                    TAX INVOICE-->
+<!--                    <t t-if="props.data.company.vat">-->
+<!--                        <br/>-->
+<!--                        GSTIN: <t t-esc="props.data.company.vat" />-->
+<!--                    </t>-->
+<!--                </div>-->
+
+<!--&lt;!&ndash;                <div t-if="props.data.company.email" t-esc="props.data.company.email" />&ndash;&gt;-->
+<!--&lt;!&ndash;                <div t-if="props.data.company.website" t-esc="props.data.company.website" />&ndash;&gt;-->
+<!--&lt;!&ndash;                <div t-if="props.data.header" style="white-space:pre-line" t-esc="props.data.header" />&ndash;&gt;-->
+<!--&lt;!&ndash;                <div t-if="props.data.cashier" class="cashier">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div>&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div>Served by <t t-esc="props.data.cashier" /></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div class="fw-bolder" t-if="props.data.trackingNumber and !props.data.bigTrackingNumber">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <span class="fs-2" t-esc="props.data.trackingNumber" />&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--            </div>-->
+<!--            <t t-if="props.data.partner and props.data.company?.country?.code == 'IN'">-->
+<!--                <div class="row">-->
+<!--                    <div class="col-6">-->
+<!--                        <span>Cust. Name: <t t-esc="props.data.partner.name" /></span>-->
+<!--                    </div>-->
+<!--                    <div class="col-6"></div>-->
+<!--                </div>-->
+<!--                <div class="row">-->
+<!--                    <div class="col-6">-->
+<!--                        <span>Phone: <t t-esc="props.data.partner.phone or props.data.partner.mobile" /></span>-->
+<!--                    </div>-->
+<!--                    <div class="col-6"><span>Cashier: <t t-esc="props.data.cashier" /></span></div>-->
+<!--                </div>-->
+<!--                <t t-if="props.data.partner.vat">-->
+<!--                    <div>-->
+<!--                        <span>Cust. GST No.: </span>-->
+<!--                        <t t-esc="props.data.partner.vat" />-->
+<!--                    </div>-->
+<!--                </t>-->
+<!--            </t>-->
+<!--            <br />-->
+<!--        </xpath>-->
+<!--    </t>-->
+
+    <t t-name="nhcl_pos_custom_tax.OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
+        <xpath expr="." position="replace">
+            <div class="pos-receipt">
+                <ReceiptHeader data="props.data.headerData" />
+                <div  style="font-size:16px; font-weight:600; text-align:left;">
+
+                    <span>Bill No: <t t-esc="props.data.name" /></span>
+                    <br/>
+                    <span>DT    : <t t-esc="props.data.date" /></span>
+                </div>
+                <OrderWidget lines="props.data.orderlines" t-slot-scope="scope" editable="false">
+                    <t t-set="line" t-value="scope.line"/>
+                    <Orderline line="omit(scope.line, 'customerNote')" class="{ 'pe-none': true }">
+                        <li t-if="line.customerNote" class="customer-note w-100 p-2 my-1 rounded text-break">
+                            <i class="fa fa-sticky-note me-1" role="img" aria-label="Customer Note" title="Customer Note"/>
+                            <t t-esc="line.customerNote" />
+                        </li>
+                        <ul t-if="line.pack_lot_lines">
+                            <li t-foreach="line.pack_lot_lines" t-as="lot" t-key="lot.cid">
+                                <t t-if="lot.order_line.product.tracking == 'lot'">
+                                    Lot Number <t t-esc="lot.lot_name"/>
+                                </t>
+                                <t t-else="">
+                                    SN <t t-esc="lot.lot_name"/>
+                                </t>
+                            </li>
+                        </ul>
+                    </Orderline>
+                </OrderWidget>
+                <div>Total QTY: <span t-esc='props.data.total_qty' class="pos-receipt-right-align"/></div>
+
+                <div class="pos-receipt-amount receipt-change mt-2">
+                    CHANGE
+                    <span t-esc="props.formatCurrency(props.data.change)" class="pos-receipt-right-align"/>
+                </div>
+
+                <!-- Total -->
+                <div>Total W/O Tax: <span t-esc='props.formatCurrency(props.data.total_without_tax)' class="pos-receipt-right-align"/></div>
+                <div>Tax: <span t-esc='props.formatCurrency(props.data.amount_tax)' class="pos-receipt-right-align"/></div>
+                <div t-if="props.data.rounding_applied">Rounding: <span t-esc='props.formatCurrency(props.data.rounding_applied)' class="pos-receipt-right-align"/></div>
+                <div t-if="props.data.total_gdiscount">Discounts <span t-esc='props.formatCurrency(props.data.total_gdiscount)' class="pos-receipt-right-align"/></div>
+                <div t-if="props.data.total_amount_discount">Discounts <span t-esc="props.formatCurrency(props.data.total_amount_discount)" class="pos-receipt-right-align"/></div>
+                <div t-if="props.data.total_line_discount">Discounts <span t-esc="props.formatCurrency(props.data.total_line_discount)" class="pos-receipt-right-align"/></div>
+                <div t-if="props.data.total_discount">Discounts: <span t-esc='props.formatCurrency(props.data.total_discount)' class="pos-receipt-right-align"/></div>
+                <div>Total: <span t-esc='props.formatCurrency(props.data.amount_total + props.data.total_gdiscount)' class="pos-receipt-right-align"/></div>
+                <div>Net Payable: <span t-esc='props.formatCurrency(props.data.amount_total + props.data.rounding_applied)'
+                                        class="pos-receipt-right-align"/></div>
+                <br/>
+
+                <!-- Payment Lines -->
+                <div class="paymentlines" t-foreach="props.data.payment_lines" t-as="line" t-key="line_index">
+                    <t t-esc="line.name" />
+                    <span t-esc="props.formatCurrency(line.amount, false)" class="pos-receipt-right-align"/>
+                    <t t-if="line.payment_method.is_credit_settlement">
+                        <t t-foreach="line.order.credit_ids_list" t-as="credit" t-key="credit.id">
+                            <br/>
+                            <span style="font-size: x-small;" t-esc="credit.voucher_number"/>
+                        </t>
+                    </t>
+                </div>
+
+                <!-- Extra Payment Info -->
+
+                <t t-if="props.data.tax_details.length > 0">
+                    <div class="pos-receipt-center-align">
+                        GST Summary
+                    </div>
+                    <div class="pos-receipt-taxes">
+                        <span />
+                        <span>Tax</span>
+                        <span>Amount</span>
+                        <span>Base</span>
+                        <span>Total</span>
+                        <t t-foreach="props.data.tax_details" t-as="tax" t-key="tax.tax.id">
+                            <span t-esc="tax.tax.letter || ''"/>
+                            <span t-if="tax.tax.amount_type != 'fixed'"><t t-esc="tax.tax.amount"/>%</span>
+                            <span t-else="" t-esc="tax.tax.name"/>
+                            <span t-esc="props.formatCurrency(tax.amount, false)" />
+                            <span t-esc="props.formatCurrency(tax.base, false)" />
+                            <span t-esc="props.formatCurrency(tax.amount + tax.base, false)" />
+                        </t>
+                        <t t-if="props.data.tax_details.length > 1">
+                            <span />
+                            <span />
+                            <span t-esc="props.formatCurrency(props.data.amount_tax, false)" />
+                            <span t-esc="props.formatCurrency(props.data.total_without_tax, false)" />
+                            <span t-esc="props.formatCurrency(props.data.amount_total, false)" />
+                        </t>
+                    </div>
+                </t>
+
+                <div class="before-footer" />
+
+                <!-- This prevents missing receipt elements in modules like `l10n_fr_pos_cert`, `l10n_co_pos`, etc. -->
+                <div class="pos-receipt-order-data" />
+<div class="terms">
+   <div style="margin-top:10px;font-size:10px;text-align:left;">
+            <div style="text-align:center;font-weight:bold;">
+                Terms  &amp;&amp; Conditions
+            </div>
+                <div>1. Exchange can be made within 7 days from the date of purchase only with price tag and bill.</div>
+                <div>2. Exchange timings: 11 AM to 8 PM.</div>
+                <div>3. No guarantee on fade of colour and zari.</div>
+                <div>4. Cash will not be refunded against goods exchanged or returned.</div>
+                <div>5. Cosmetics, toys, undergarments, home appliances, footwear and ethnic wear cannot be exchanged.</div>
+                <div>6. Alteration items cannot be exchanged or refunded.</div>
+                <div>7. No exchange on offer items.</div>
+                <div>8. Any disputes are subject to Visakhapatnam jurisdiction only.</div>
+            </div>
+    </div>
+                <div t-if="props.data.pos_qr_code">
+                    <br /><br />
+                    <div class="pos-receipt-order-data mb-2">
+                        Scan me to request an invoice for your purchase.
+                    </div>
+                    <img id="posqrcode" t-att-src="props.data.pos_qr_code" class="pos-receipt-qrcode"/>
+                </div>
+
+                <div t-if="props.data.ticket_code">
+                    <br /><br />
+                    <div class="pos-receipt-order-data">
+                        You can go to <t t-out="props.data.base_url"/>/pos/ticket and use the code below to request an invoice online
+                    </div>
+                    <div class="pos-receipt-order-data">
+                        Unique Code: <t t-out="props.data.ticket_code"/>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+               <div t-if="props.data.footer"  class="pos-receipt-center-align" style="white-space:pre-line">
+                   <br/>
+                   <t t-esc="props.data.footer" />
+                    <br/>
+                    <br/>
+                </div>
+
+                <div class="after-footer">
+                    <t t-foreach="props.data.paymentlines" t-as="line" t-key="line_index">
+                        <t t-if="line.ticket">
+                            <br />
+                            <div class="pos-payment-terminal-receipt">
+                                <pre t-esc="line.ticket" />
+                            </div>
+                        </t>
+                    </t>
+                </div>
+
+                <t t-if="props.data.shippingDate">
+                    <br/>
+                    <div class="pos-receipt-order-data">
+                        Expected delivery:
+                        <div><t t-esc="props.data.shippingDate" /></div>
+                    </div>
+                </t>
+
+<!--                <div class="pos-receipt-order-data">-->
+<!--                    <br/>-->
+<!--                    <p>Powered by Odoo</p>-->
+<!--                    <div t-esc="props.data.name" />-->
+<!--                    <div id="order-date" t-esc="props.data.date" />-->
+<!--                </div>-->
+            </div>
+
+        </xpath>
+    </t>
+</templates>
