@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<!-- ========================= -->
+<!-- MERGED RECEIPT -->
+<!-- ========================= -->
+
+<t t-name="nhcl_pos_custom_tax.OrderReceipt"
+   t-inherit="point_of_sale.OrderReceipt"
+   t-inherit-mode="extension">
+
+    <xpath expr="." position="replace">
+
+        <div class="pos-receipt">
+
+            <!-- ========================= -->
+            <!-- CUSTOMER RECEIPT -->
+            <!-- ========================= -->
+            <div class="pos-receipt-center-align" style="font-weight:bold;">
+                Customer Receipt
+            </div>
+
+            <t t-call="nhcl_pos_custom_tax.full_receipt_body"/>
+
+            <!-- PAGE BREAK -->
+            <div style="page-break-after: always;"></div>
+
+            <!-- ========================= -->
+            <!-- DUPLICATE RECEIPT -->
+            <!-- ========================= -->
+            <div class="pos-receipt-center-align" style="font-weight:bold;">
+                Duplicate Receipt
+            </div>
+
+            <t t-call="nhcl_pos_custom_tax.full_receipt_body"/>
+
+        </div>
+
+    </xpath>
+
+</t>
+
+
+<!-- ========================= -->
+<!-- FULL RECEIPT BODY -->
+<!-- ========================= -->
+
+<t t-name="nhcl_pos_custom_tax.full_receipt_body">
+
+    <ReceiptHeader data="props.data.headerData"/>
+
+    <!-- HEADER INFO -->
+    <div style="font-size:16px; font-weight:600; text-align:left;">
+        <span>Bill No: <t t-esc="props.data.name"/></span>
+        <br/>
+        <span>DT : <t t-esc="props.data.date"/></span>
+    </div>
+
+    <!-- ORDER LINES -->
+    <OrderWidget lines="props.data.orderlines" t-slot-scope="scope" editable="false">
+
+        <t t-set="line" t-value="scope.line"/>
+
+        <Orderline line="scope.line" class="{ 'pe-none': true }">
+
+            <!-- customer note -->
+            <li t-if="line.customerNote" class="customer-note">
+                <t t-esc="line.customerNote"/>
+            </li>
+
+            <!-- lot / serial -->
+            <ul t-if="line.pack_lot_lines">
+                <li t-foreach="line.pack_lot_lines" t-as="lot" t-key="lot.cid">
+                    <t t-esc="lot.lot_name"/>
+                </li>
+            </ul>
+
+        </Orderline>
+
+    </OrderWidget>
+
+    <!-- TOTALS -->
+    <div>Total QTY: <span t-esc="props.data.total_qty"/></div>
+
+    <div class="pos-receipt-amount mt-2">
+        CHANGE
+        <span t-esc="props.formatCurrency(props.data.change)" class="pos-receipt-right-align"/>
+    </div>
+
+    <div>Total W/O Tax: <span t-esc="props.formatCurrency(props.data.total_without_tax)"/></div>
+    <div>Tax: <span t-esc="props.formatCurrency(props.data.amount_tax)"/></div>
+
+    <div t-if="props.data.rounding_applied">
+        Rounding: <span t-esc="props.formatCurrency(props.data.rounding_applied)"/>
+    </div>
+
+    <div t-if="props.data.total_gdiscount">
+        Discounts <span t-esc="props.formatCurrency(props.data.total_gdiscount)"/>
+    </div>
+
+    <div t-if="props.data.total_discount">
+        Discounts: <span t-esc="props.formatCurrency(props.data.total_discount)"/>
+    </div>
+
+    <div>
+        Total:
+        <span t-esc="props.formatCurrency(props.data.amount_total + props.data.total_gdiscount)"/>
+    </div>
+
+    <div>
+        Net Payable:
+        <span t-esc="props.formatCurrency(props.data.amount_total + props.data.rounding_applied)"/>
+    </div>
+
+    <br/>
+
+    <!-- PAYMENT LINES -->
+    <div class="paymentlines"
+         t-foreach="props.data.payment_lines || []"
+         t-as="line"
+         t-key="line_index">
+
+        <t t-esc="line.name"/>
+        <span t-esc="props.formatCurrency(line.amount, false)" class="pos-receipt-right-align"/>
+
+        <t t-if="line.payment_method.is_credit_settlement">
+            <t t-foreach="line.order.credit_ids_list || []" t-as="credit" t-key="credit.id">
+                <br/>
+                <span style="font-size: x-small;" t-esc="credit.voucher_number"/>
+            </t>
+        </t>
+
+    </div>
+
+    <!-- GST SUMMARY -->
+    <t t-if="props.data.tax_details and props.data.tax_details.length > 0">
+
+        <div class="pos-receipt-center-align">
+            GST Summary
+        </div>
+
+        <div class="pos-receipt-taxes">
+
+            <t t-foreach="props.data.tax_details" t-as="tax" t-key="tax.tax.id">
+
+                <span t-esc="tax.tax.letter || ''"/>
+                <span t-if="tax.tax.amount_type != 'fixed'">
+                    <t t-esc="tax.tax.amount"/>%
+                </span>
+                <span t-else="" t-esc="tax.tax.name"/>
+
+                <span t-esc="props.formatCurrency(tax.amount, false)"/>
+                <span t-esc="props.formatCurrency(tax.base, false)"/>
+                <span t-esc="props.formatCurrency(tax.amount + tax.base, false)"/>
+
+            </t>
+
+        </div>
+
+    </t>
+
+    <!-- TERMS -->
+    <div class="terms">
+        <div style="margin-top:10px;font-size:10px;text-align:left;">
+            <div style="text-align:center;font-weight:bold;">
+                Terms &amp; Conditions
+            </div>
+            <div>1. Exchange can be made within 7 days from the date of purchase only with price tag and bill.</div>
+            <div>2. Exchange timings: 11 AM to 8 PM.</div>
+            <div>3. No guarantee on fade of colour and zari.</div>
+            <div>4. Cash will not be refunded against goods exchanged or returned.</div>
+            <div>5. Cosmetics, toys, undergarments, home appliances, footwear and ethnic wear cannot be exchanged.</div>
+            <div>6. Alteration items cannot be exchanged or refunded.</div>
+            <div>7. No exchange on offer items.</div>
+            <div>8. Any disputes are subject to Visakhapatnam jurisdiction only.</div>
+        </div>
+    </div>
+
+    <!-- QR -->
+    <div t-if="props.data.pos_qr_code">
+        <br/>
+        <div class="pos-receipt-order-data mb-2">
+            Scan me to request an invoice
+        </div>
+        <img t-att-src="props.data.pos_qr_code" class="pos-receipt-qrcode"/>
+    </div>
+
+    <!-- FOOTER -->
+    <div t-if="props.data.footer" class="pos-receipt-center-align" style="white-space:pre-line">
+        <br/>
+        <t t-esc="props.data.footer"/>
+        <br/>
+    </div>
+
+</t>
+
+</templates>
